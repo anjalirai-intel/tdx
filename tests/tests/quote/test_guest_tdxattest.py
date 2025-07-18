@@ -34,7 +34,6 @@ def change_qgsd_state(state):
     assert 0 == rc.returncode, 'Failed change state of qgsd'
 
 @pytest.mark.quote_generation
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-580")
 def test_guest_tdxattest_tsm():
     """
     TDX attest library
@@ -57,7 +56,6 @@ def test_guest_tdxattest_tsm():
         assert 'Successfully get the TD Quote' in stdout.read().decode()
 
 @pytest.mark.quote_generation
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-580")
 def test_guest_tdxattest_tsm_failure():
     """
     TDX attest library
@@ -95,7 +93,6 @@ def test_guest_tdxattest_vsock():
         assert 'Successfully get the TD Quote' in stdout.read().decode()
 
 @pytest.mark.quote_generation
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-580")
 def test_guest_tdxattest_vsock_wrong_qgs_addr(qm):
     """
     Success even when QGS address is not properly configured
@@ -121,7 +118,6 @@ def test_guest_tdxattest_vsock_wrong_qgs_addr(qm):
     assert 'Successfully get the TD Quote' in stdout.read().decode()
 
 @pytest.mark.quote_generation
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-580")
 def test_guest_tdxattest_vsock_failure():
     """
     TDX attest library
@@ -140,7 +136,6 @@ def test_guest_tdxattest_vsock_failure():
         assert (ret != 0) and ('Failed to get the quote' in stderr.read().decode())
 
 @pytest.mark.quote_generation
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-580")
 def test_guest_tdxattest_failure():
     """
     TDX attest library
@@ -159,7 +154,6 @@ def test_guest_tdxattest_failure():
         assert (ret != 0) and ('Failed to get the quote' in stderr.read().decode())
 
 @pytest.mark.quote_generation
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-580")
 def test_guest_tdxattest_failure_1(qm):
     """
     Failure when vsock disabled and QGS addr is not properly configured

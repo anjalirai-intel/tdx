@@ -27,7 +27,6 @@ import util
 
 script_path=os.path.dirname(os.path.realpath(__file__))
 
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-581")
 def test_guest_noept_fail(qm, release_kvm_use):
     """
     tdx_NOEPT test case (See https://github.com/intel/tdx/wiki/Tests)
@@ -45,8 +44,11 @@ def test_guest_noept_fail(qm, release_kvm_use):
         dmesg_end = str(cs.stdout)
 
         # Verify "TDX requires mmio caching" in dmesg (but only one more time)
-        dmesg_start_count = dmesg_start.count("EPT is required for TDX")
-        dmesg_end_count = dmesg_end.count("EPT is required for TDX")
+        # dmesg_start_count = dmesg_start.count("EPT is required for TDX")
+        # dmesg_end_count = dmesg_end.count("EPT is required for TDX")
+        dmesg_start_count = dmesg_start.count("Cannot enable TDX with EPT disabled")
+        dmesg_end_count = dmesg_end.count("Cannot enable TDX with EPT disabled")
+
         assert dmesg_end_count == dmesg_start_count+1, "dmesg missing proper message"
 
         # Run Qemu and verify failure
@@ -55,9 +57,8 @@ def test_guest_noept_fail(qm, release_kvm_use):
         # expect qemu quit immediately with specific error message
         _, err = qm.communicate()
         print(err.decode())
-        assert "-accel kvm: vm-type TDX not supported by KVM" in err.decode()
+        assert re.search(r"-accel kvm: vm-type (TDX|X86_TDX_VM) not supported by KVM", err.decode())
 
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-581")
 def test_guest_disable_tdx_fail(qm, release_kvm_use):
     """
     tdx_disabled test case (See https://github.com/intel/tdx/wiki/Tests)
@@ -69,7 +70,7 @@ def test_guest_disable_tdx_fail(qm, release_kvm_use):
 
         # expect qemu quit immediately with specific error message
         _, err = qm.communicate()
-        assert "-accel kvm: vm-type TDX not supported by KVM" in err.decode()
+        assert re.search(r"-accel kvm: vm-type (TDX|X86_TDX_VM) not supported by KVM", err.decode())
 
 class KvmIntelModuleReloader:
     """

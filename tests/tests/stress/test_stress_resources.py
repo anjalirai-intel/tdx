@@ -21,6 +21,7 @@ import pytest
 
 import Qemu
 import util
+import re
 
 def vm_teardown(max_td_vms, qm):
     try:
@@ -103,7 +104,7 @@ def check_qemu_fail_to_start(qm, error_msg=None):
             return
         pytest.fail('The TD is running !')
     if error_msg:
-        assert error_msg in err.decode()
+        assert re.search(error_msg, err.decode())
 
 def test_stress_max_guests():
     """
@@ -150,7 +151,7 @@ def test_stress_max_guests():
         # expect qemu quit immediately with a specific error message
         with Qemu.QemuMachine() as one_more:
             one_more.run()
-            check_qemu_fail_to_start(one_more, error_msg="KVM_TDX_INIT_VM failed: No space left on device")
+            check_qemu_fail_to_start(one_more, error_msg="KVM_TDX_INIT_VM failed(:|) No space left on device")
     except Exception as e:
         vm_teardown(max_td_vms, qm)
         pytest.fail(f"Test failed due to exception: {e}")

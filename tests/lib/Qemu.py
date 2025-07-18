@@ -54,7 +54,7 @@ class QemuAccel:
 
 class QemuCpu:
     def __init__(self):
-        self.cpu_type = 'host'
+        self.cpu_type = 'host,-kvm-steal-time,pmu=off'
         self.cpu_flags = ''
         self.nb_cores=4
         self.nb_sockets=1
@@ -177,7 +177,7 @@ class QemuMachineType:
     Qemu_Machine_Params = {
         QemuEfiMachine.OVMF_Q35:['-machine', 'q35,kernel_irqchip=split'],
         QemuEfiMachine.OVMF_Q35_TDX:[
-            '-machine', 'q35,hpet=off,kernel_irqchip=split,confidential-guest-support=tdx']
+            '-machine', 'q35,hpet=off,kernel_irqchip=split,confidential-guest-support=tdx,memory-backend=ram1']
     }
     def __init__(self, machine = QemuEfiMachine.OVMF_Q35_TDX):
         self.machine = machine
@@ -197,7 +197,9 @@ class QemuMachineType:
         if self.machine == QemuEfiMachine.OVMF_Q35_TDX:
             tdx_object = {'qom-type':'tdx-guest', 'id':'tdx'}
             if self.qgs_addr:
-                tdx_object.update({"quote-generation-socket": self.qgs_addr})
+                value_str = ":".join([f"{v}" for v in self.qgs_addr.values()])
+                tdx_object.update({"quote-generation-service": value_str})
+                # tdx_object.update({"quote-generation-socket": self.qgs_addr})
             qemu_args = ['-object', str(tdx_object)] + qemu_args
         return qemu_args
 
@@ -251,6 +253,7 @@ class QemuCommand:
         _args = ['/usr/libexec/qemu-kvm']
         for p in self.plugins.values():
             _args.extend(p.args())
+        _args.extend(['-object', f"memory-backend-memfd-private,id=ram1,size={self.plugins['memory'].args()[1]}"])
         return _args + self.command
 
     def add_qemu_run_log(self):
@@ -407,7 +410,7 @@ class QemuSSH():
 
         self.username = 'root'
         self.password = '123456'
-        self.private_key = paramiko.RSAKey.from_private_key_file('/home/sdp/bprashan/centos_keys/id_rsa')
+        self.private_key = paramiko.RSAKey.from_private_key_file('/home/intel/anjali/tdx/vm_key')
         self.port = qemu_machine.fwd_port
 
         # prevent paramiko to do spurious logs on stdout
@@ -469,7 +472,7 @@ class QemuSSH():
         kv_pass=self.password
         kv_host='127.0.0.1'
         kv_port=self.port
-        ssh_opts=f'-i /home/sdp/bprashan/centos_keys/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
+        ssh_opts=f'-i /home/intel/anjali/tdx/vm_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
         rsync_opts='-atrv --delete --exclude="*~"'
         # use sshpass to pass clear text password for ssh
         rsync_opts += f' -e " ssh {ssh_opts}"'
@@ -534,7 +537,7 @@ class QemuMachine:
                  memory='2G',
                  service_blacklist=[]):
         self.name = name
-        self.image_dir = '/var/tmp/tdxtest/'
+        self.image_dir = "/home/intel/anjali/tmp/tdxtest" #'/var/tmp/tdxtest/'
         self.guest_initial_img = os.environ.get('TDXTEST_GUEST_IMG', f'{self.image_dir}/tdx-guest.qcow2')
         self._setup_workdir()
         self._create_image()
@@ -589,7 +592,8 @@ class QemuMachine:
     def _setup_workdir(self):
         # if /run/user/ user folder exists, use it to store the work dir
         # if not use the default path for tempfile that is /tmp/
-        run_path = pathlib.Path('/run/user/%d/' % (os.getuid()))
+        # run_path = pathlib.Path('/run/user/%d/' % (os.getuid()))
+        run_path = pathlib.Path('/home/intel/anjali/tmp/')
         if run_path.exists():
             tempfile.tempdir = str(run_path)
         # delete=False : we want to manage cleanup ourself for debugging purposes
@@ -615,7 +619,7 @@ class QemuMachine:
         kv_user='root'
         kv_host='127.0.0.1'
         kv_port=self.fwd_port
-        ssh_opts=f'-i /home/sdp/bprashan/centos_keys/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
+        ssh_opts=f'-i /home/intel/anjali/tdx/vm_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
         rsync_opts='-atrv --delete --exclude="*~"'
         # use sshpass to pass clear text password for ssh
         rsync_opts += f' -e "ssh {ssh_opts}"'
