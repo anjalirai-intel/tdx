@@ -410,7 +410,11 @@ class QemuSSH():
 
         self.username = 'root'
         self.password = '123456'
-        self.private_key = paramiko.RSAKey.from_private_key_file('/home/intel/anjali/tdx/vm_key')
+        self.vm_key = os.environ.get('VM_KEY', None)
+        if not self.vm_key:
+            print('VM_KEY environment variable is not set, cannot use SSH')
+            raise RuntimeError('VM_KEY environment variable is not set, cannot use SSH')
+        self.private_key = paramiko.RSAKey.from_private_key_file(self.vm_key)
         self.port = qemu_machine.fwd_port
 
         # prevent paramiko to do spurious logs on stdout
@@ -472,7 +476,7 @@ class QemuSSH():
         kv_pass=self.password
         kv_host='127.0.0.1'
         kv_port=self.port
-        ssh_opts=f'-i /home/intel/anjali/tdx/vm_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
+        ssh_opts=f'-i {self.vm_key} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
         rsync_opts='-atrv --delete --exclude="*~"'
         # use sshpass to pass clear text password for ssh
         rsync_opts += f' -e " ssh {ssh_opts}"'
@@ -536,8 +540,9 @@ class QemuMachine:
                  machine=QemuEfiMachine.OVMF_Q35_TDX,
                  memory='2G',
                  service_blacklist=[]):
+        self.workdir_path = os.environ.get("WORKDIR_PATH", '/var/tmp/')
         self.name = name
-        self.image_dir = "/home/intel/anjali/tmp/tdxtest" #'/var/tmp/tdxtest/'
+        self.image_dir = os.path.join(self.workdir_path, "tdxtest")
         self.guest_initial_img = os.environ.get('TDXTEST_GUEST_IMG', f'{self.image_dir}/tdx-guest.qcow2')
         self._setup_workdir()
         self._create_image()
@@ -593,7 +598,7 @@ class QemuMachine:
         # if /run/user/ user folder exists, use it to store the work dir
         # if not use the default path for tempfile that is /tmp/
         # run_path = pathlib.Path('/run/user/%d/' % (os.getuid()))
-        run_path = pathlib.Path('/home/intel/anjali/tmp/')
+        run_path = pathlib.Path(os.environ.get('WORKDIR_PATH', '/run/user/%d/' % (os.getuid())))
         if run_path.exists():
             tempfile.tempdir = str(run_path)
         # delete=False : we want to manage cleanup ourself for debugging purposes
@@ -616,10 +621,16 @@ class QemuMachine:
         fname : local file or folder
         dest : destination folder (parent folder)
         """
+        # m = QemuSSH(self)
+        # m.rsync_file(fname, dest, sudo=sudo)
         kv_user='root'
         kv_host='127.0.0.1'
         kv_port=self.fwd_port
-        ssh_opts=f'-i /home/intel/anjali/tdx/vm_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
+        vm_key = os.environ.get('VM_KEY', None)
+        if not vm_key:
+            print('VM_KEY environment variable is not set, cannot use SSH')
+            raise RuntimeError('VM_KEY environment variable is not set, cannot use SSH')
+        ssh_opts=f'-i {vm_key} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p {kv_port}'
         rsync_opts='-atrv --delete --exclude="*~"'
         # use sshpass to pass clear text password for ssh
         rsync_opts += f' -e "ssh {ssh_opts}"'

@@ -75,7 +75,7 @@ def cpu_core():
 
 @pytest.fixture(scope="function", autouse=True)
 def test_cleanup():
-    results = glob.glob("/home/intel/anjali/tmp/tdxtest*")
+    results = glob.glob(os.path.join(os.environ.get("WORKDIR_PATH", "/tmp/"), "tdxtest*"))
 
     for folder in results:
         pid_file = os.path.join(folder, "qemu.pid")

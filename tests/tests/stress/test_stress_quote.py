@@ -32,6 +32,7 @@ def test_stress_tdxattest_tsm():
 
         qm.run()
         ssh = Qemu.QemuSSH(qm)
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
 
         # ssh.check_exec('rm -f /etc/tdx-attest.conf')
         nb_iterations = 200

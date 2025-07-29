@@ -50,6 +50,7 @@ def test_guest_tdxattest_tsm():
 
         change_qgsd_state('start')
         ssh.check_exec('rm -f /etc/tdx-attest.conf')
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
         ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
         stdout, _ = ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 
@@ -67,6 +68,7 @@ def test_guest_tdxattest_tsm_failure():
         ssh = Qemu.QemuSSH(qm)
 
         ssh.check_exec('rm -f /etc/tdx-attest.conf')
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
         ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
         ret, stdout, stderr = ssh.exec_command('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 
@@ -86,7 +88,7 @@ def test_guest_tdxattest_vsock():
         ssh = Qemu.QemuSSH(qm)
 
         disable_tsm(ssh)
-
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
         ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
         ret, stdout, stderr = ssh.exec_command('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 
@@ -111,7 +113,7 @@ def test_guest_tdxattest_vsock_wrong_qgs_addr(qm):
 
     qm.run()
     ssh = Qemu.QemuSSH(qm)
-
+    ssh.exec_command('yum -y install gcc make 2>/dev/null')
     ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
     ret, stdout, stderr = ssh.exec_command('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 
@@ -129,7 +131,7 @@ def test_guest_tdxattest_vsock_failure():
         ssh = Qemu.QemuSSH(qm)
 
         disable_tsm(ssh)
-
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
         ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
         ret, stdout, stderr = ssh.exec_command('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 
@@ -147,7 +149,7 @@ def test_guest_tdxattest_failure():
 
         disable_tsm(ssh)
         ssh.check_exec('rm -f /etc/tdx-attest.conf')
-
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
         ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
         ret, stdout, stderr = ssh.exec_command('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 
@@ -169,7 +171,7 @@ def test_guest_tdxattest_failure_1(qm):
 
     qm.run()
     ssh = Qemu.QemuSSH(qm)
-
+    ssh.exec_command('yum -y install gcc make 2>/dev/null')
     ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
     ret, stdout, stderr = ssh.exec_command('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')
 

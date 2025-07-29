@@ -93,6 +93,7 @@ def run_trust_authority():
 
         # stdout, _ = ssh.check_exec('lsb_release -cs')
         # ubuntu_codename = stdout.read().decode().strip()
+        ssh.exec_command('yum -y install gcc make 2>/dev/null')
         ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && make clean && make')
         try:
           stdout, stderr = ssh.check_exec('cd /opt/intel/tdx-quote-generation-sample/ && ./test_tdx_attest')

@@ -32,6 +32,27 @@ Examples:
 EOM
 }
 
+
+setup_vm() {
+  if ! command -v virt-customize &> /dev/null ; then
+	  echo "'virt-customize' not found, installing..."
+	  dnf install -y guestfs-tools wget
+  fi
+  if ! [ -f sgx_rpm_local_repo.tgz ]; then
+    wget https://download.01.org/intel-sgx/latest/dcap-latest/linux/distro/centos-stream9/sgx_rpm_local_repo.tgz
+  fi
+
+  if ! virt-customize -a $TDXTEST_GUEST_IMG --no-selinux-relabel \
+    --copy-in "${SCRIPT_DIR}/setup_vm.sh:/tmp/" \
+    --copy-in "${SCRIPT_DIR}/sgx_rpm_local_repo.tgz:/tmp/" \
+    --run-command "bash /tmp/setup_vm.sh"; then
+    error "Failed to setup the VM image with 'virt-customize'."
+    exit 1
+  fi
+
+  # dnf install -y yum-utils gcc make
+}
+
 parse_params() {
     while :; do
         case "${1-}" in
@@ -76,6 +97,8 @@ sudo dnf install -y python3 python3-pip msr-tools cpuid
 sudo pip3 install tox
 
 export TDXTEST_GUEST_IMG
+
+setup_vm
 
 echo "Run tests with TD image: ${TDXTEST_GUEST_IMG}"
 echo "  pytest args: ${pytest_args}"
