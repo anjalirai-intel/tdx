@@ -23,7 +23,6 @@ import pytest
 
 import util
 
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-585")
 def test_stress_boot():
     """
     Boot in loop

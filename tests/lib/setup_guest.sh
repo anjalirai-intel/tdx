@@ -2,7 +2,7 @@
 
 # this script is supposed to be executed under root
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-export no_proxy=127.0.0.1,localhost,linux-ftp.intel.com
+export no_proxy=127.0.0.1,localhost,linux-ftp.intel.com,ubit-artifactory-or.intel.com
 sudo yum install -y python3 python3-pip cpuid git make gcc
 
 cd ${SCRIPT_DIR}/tdx-tools/

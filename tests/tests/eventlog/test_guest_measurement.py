@@ -23,7 +23,6 @@ import pytest
 import Qemu
 from common import *
 
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-579")
 def test_guest_measurement_check_rtmr(qm):
     """
     Boot measurements check

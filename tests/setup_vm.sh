@@ -2,16 +2,14 @@
 
 # This script sets up a virtual machine environment suitable for tdx tests present in the canonical repository.
 
-set -ex
-
-export no_proxy="127.0.0.1,localhost,linux*.intel.com,ubit*.intel.com"
+set -e
 
 setup_no_proxy() {
     proxy_env=$(grep -i proxy /etc/environment 2>/dev/null || true)
     if [[ "$proxy_env" =~ "no_proxy" ]]; then
-        sed -i 's/no_proxy=.*/no_proxy="127.0.0.1,localhost,linux*.intel.com,ubit*.intel.com"/' /etc/environment
+        sed -i 's/no_proxy=.*/no_proxy="127.0.0.1,localhost,linux-ftp.intel.com,ubit-artifactory-or.intel.com"/' /etc/environment
     else
-        echo 'no_proxy="127.0.0.1,localhost,linux*.intel.com,ubit*.intel.com"' >> /etc/environment
+        echo 'no_proxy="127.0.0.1,localhost,linux-ftp.intel.com,ubit-artifactory-or.intel.com"' >> /etc/environment
     fi
 
     if [[ "$proxy_env" =~ "http_proxy" ]]; then

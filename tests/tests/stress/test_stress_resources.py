@@ -73,7 +73,6 @@ def test_stress_memory_limit_resource_vm(qm):
 
     qm.stop()
 
-@pytest.mark.xfail(reason="https://jira.devtools.intel.com/browse/SICT0-587")
 def test_stress_max_vcpus(qm):
     """
     Test max vcpus (No Intel Case ID)
