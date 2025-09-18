@@ -139,7 +139,7 @@ class CCEL(BinaryBlob, dict):
         """
         if not os.path.exists(acpi_file):
             LOG.error("Could not find the ACPI file %s", acpi_file)
-            return None
+            assert False, f"Could not find the ACPI file {acpi_file}"
 
         try:
             with open(acpi_file, "rb") as fobj:

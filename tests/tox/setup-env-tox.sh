@@ -37,14 +37,15 @@ cleanup() {
 
 install_deps() {
   sudo dnf install -y sshpass cpuid git
-  rm -rf /tmp/iperf-vsock
-  git clone https://github.com/stefano-garzarella/iperf-vsock /tmp/iperf-vsock
-  cd /tmp/iperf-vsock
-  ./bootstrap.sh
-  mkdir build
-  cd build
-  ../configure
-  make
+  if [[ ! -d /tmp/iperf-vsock ]]; then
+    git clone https://github.com/stefano-garzarella/iperf-vsock /tmp/iperf-vsock
+    cd /tmp/iperf-vsock
+    ./bootstrap.sh
+    mkdir build
+    cd build
+    ../configure
+    make
+  fi
   #sudo dnf remove iperf3 -y
   #sudo dnf config-manager --add-repo https://kobuk-team.github.io/tdx-testing/tdx-testing.repo
   #sudo dnf update || true

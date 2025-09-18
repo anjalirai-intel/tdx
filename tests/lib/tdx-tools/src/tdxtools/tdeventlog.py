@@ -303,7 +303,7 @@ class TDEventLogActor:
         elif os.path.exists("/sys/firmware/acpi/tables/CCEL"):
             ccel_file = "/sys/firmware/acpi/tables/CCEL"
         else:
-            assert f"Could not find the CCEL file {ccel_file}"
+            assert False, f"Could not find the CCEL file {ccel_file}"
 
         try:
             with open(ccel_file, "rb") as fobj:

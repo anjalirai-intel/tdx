@@ -33,7 +33,9 @@ def test_guest_measurement_check_rtmr(qm):
         m = Qemu.QemuSSH(qm)
 
         deploy_and_setup(m)
-
-        m.check_exec('tdrtmrcheck')
-
+        stdout, stderr = m.check_exec('tdrtmrcheck')
+        output = stderr.read().decode('utf-8')
+        print("Stderr: ", output)
+        print("Stdout: ", stdout.read().decode('utf-8'))
+        assert "RTMR[0] passed the verification." in output
         qm.stop()

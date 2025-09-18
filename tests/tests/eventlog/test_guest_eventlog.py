@@ -35,9 +35,9 @@ def test_guest_eventlog(qm):
     deploy_and_setup(m)
 
     stdout, stderr = m.check_exec('tdeventlog')
-    for l in stderr.readlines():
-        print(l.rstrip())
-
+    output = stderr.read().decode('utf-8')
+    print("Stderr: ", output)
+    assert "==== TDX Event Log Entry - 0 " in output
     qm.stop()
 
 def test_guest_eventlog_initrd(qm):
@@ -51,7 +51,7 @@ def test_guest_eventlog_initrd(qm):
     deploy_and_setup(m)
 
     stdout, stderr = m.check_exec('tdeventlog_check_initrd')
-    for l in stderr.readlines():
-        print(l.rstrip())
-
+    output = stderr.read().decode('utf-8')
+    print("Stderr: ", output)
+    assert "Found event log with matching digest" in output
     qm.stop()

@@ -108,7 +108,8 @@ class QemuOvmf():
         # cannot use pflash with kvm accel, need kvm support
         # so use bios by default
         self.bios = True
-        self.bios_path = '/usr/share/edk2/ovmf/OVMF.inteltdx.fd'
+        # self.bios_path = '/usr/share/edk2/ovmf/OVMF.inteltdx.fd'
+        self.bios_path = '/usr/share/qemu/OVMF.fd'
         self.ovmf_code_path = None
         self.ovmf_vars_template_path = None
         self.flash_size = QemuEfiFlashSize.SIZE_4MB
