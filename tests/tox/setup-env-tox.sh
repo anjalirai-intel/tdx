@@ -67,8 +67,6 @@ else
   fi
 fi
 
-echo "inside setup env tox"
-
 cleanup
 
 set -e

@@ -50,6 +50,19 @@ setup_vm() {
     error "Failed to setup the VM image with 'virt-customize'."
     exit 1
   fi
+
+  if [ -f "${SCRIPT_DIR}/VM_SETUP_SUCCESS" ]; then
+    return
+  fi
+
+  if ! virt-customize -a $TDXTEST_GUEST_IMG \
+    --root-password password:123456 --uninstall cloud-init \
+    --ssh-inject "root:file:${VM_KEY}.pub"; then
+    error "Failed to setup the VM image with 'virt-customize'."
+    exit 1
+  fi
+
+  touch "${SCRIPT_DIR}/VM_SETUP_SUCCESS"
 }
 
 parse_params() {
@@ -97,9 +110,24 @@ sudo pip3 install tox
 
 export TDXTEST_GUEST_IMG
 
+if [[ -z "${VM_KEY}" ]]; then
+    export VM_KEY="${SCRIPT_DIR}/vm_ssh_test_key"
+fi
 setup_vm
+
+uname_output=$(uname -r)
+if [[ $uname_output == *"bkc"* ]]; then
+    export GLIBC_TUNABLES="glibc.cpu.x86_shstk=off"
+fi
 
 echo "Run tests with TD image: ${TDXTEST_GUEST_IMG}"
 echo "  pytest args: ${pytest_args}"
-export PATH=$PATH:/usr/local/bin:/home/sdp/.local/bin
+
+if [[ -z "$SUDO_USER" ]]; then
+    LOGIN_USER=`whoami`
+else
+    LOGIN_USER=$SUDO_USER
+fi
+
+export PATH=$PATH:/usr/local/bin:/home/${LOGIN_USER}/.local/bin
 tox -- --ignore=lib/ ${pytest_args}

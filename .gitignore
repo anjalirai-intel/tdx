@@ -6,3 +6,5 @@ vmlinuz*
 *cache*
 .tox
 *.log
+VM_SETUP_SUCCESS
+sgx_rpm_local_repo.tgz
