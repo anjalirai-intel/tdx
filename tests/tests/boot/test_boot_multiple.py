@@ -19,6 +19,7 @@
 
 import os
 import Qemu
+import pytest
 
 def test_4vcpus_1socket_10times(qm):
     """
@@ -33,6 +34,7 @@ def test_4vcpus_1socket_10times(qm):
         qm.stop()
 
 
+@pytest.mark.xfail("bkc" in os.uname().release, reason="Linux TD VM doesn't support more than 1 socket/die CPU topology")
 def test_4vcpus_2sockets_5times(qm):
     """
     Test 4vcpus 2sockets 5 times (Intel Case ID 010)

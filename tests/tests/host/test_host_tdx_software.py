@@ -20,7 +20,10 @@
 import re
 import subprocess
 import tdxtools
+import os
+import pytest
 
+@pytest.mark.xfail("bkc" in os.uname().release, reason="tdx_host_platform is not present on BKC CPU")
 def test_host_tdx_cpu():
     """
     Check that the CPU has TDX support enabled

@@ -21,6 +21,8 @@ import pytest
 import subprocess
 import Qemu
 
+from common import get_kernel_version
+
 # This file contains tests for the tdxattest lib in the guest
 # The tdxattest library allows application to request a quote from the
 # host system
@@ -75,6 +77,7 @@ def test_guest_tdxattest_tsm_failure():
         assert (ret != 0) and ('Failed to get the quote' in stderr.read().decode())
 
 @pytest.mark.quote_generation
+@pytest.mark.xfail(get_kernel_version() < 6.7, reason="TSM Changes introduced in kernel 6.7")
 def test_guest_tdxattest_vsock():
     """
     TDX attest library
@@ -120,6 +123,7 @@ def test_guest_tdxattest_vsock_wrong_qgs_addr(qm):
     assert 'Successfully get the TD Quote' in stdout.read().decode()
 
 @pytest.mark.quote_generation
+@pytest.mark.xfail(get_kernel_version() < 6.7, reason="TSM Changes introduced in kernel 6.7")
 def test_guest_tdxattest_vsock_failure():
     """
     TDX attest library
@@ -138,6 +142,7 @@ def test_guest_tdxattest_vsock_failure():
         assert (ret != 0) and ('Failed to get the quote' in stderr.read().decode())
 
 @pytest.mark.quote_generation
+@pytest.mark.xfail(get_kernel_version() < 6.7, reason="TSM Changes introduced in kernel 6.7")
 def test_guest_tdxattest_failure():
     """
     TDX attest library

@@ -18,7 +18,9 @@
 import os
 import Qemu
 from common import *
+import pytest
 
+@pytest.mark.xfail("bkc" in os.uname().release, reason="CCEL file missing on BKC kernel")
 def test_guest_boot(qm):
     """
     Boot TD

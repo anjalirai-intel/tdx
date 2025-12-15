@@ -25,3 +25,7 @@ guest_workdir='/var/tmp'
 def deploy_and_setup(m : Qemu.QemuSSH):
     m.rsync_file(f'{script_path}/../', f'{guest_workdir}')
     m.check_exec(f'cd {guest_workdir} && ./lib/setup_guest.sh')
+
+
+def get_kernel_version():
+    return float(".".join(os.uname().release.split(".")[:2]))

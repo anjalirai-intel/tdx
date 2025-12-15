@@ -23,6 +23,7 @@ import pytest
 import Qemu
 from common import *
 
+@pytest.mark.xfail("bkc" in os.uname().release, reason="CCEL file missing on BKC kernel")
 def test_guest_measurement_check_rtmr(qm):
     """
     Boot measurements check

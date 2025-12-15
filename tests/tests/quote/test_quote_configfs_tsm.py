@@ -17,12 +17,15 @@
 
 import os
 import time
+import pytest
 
 import Qemu
-from common import deploy_and_setup
+from common import deploy_and_setup, get_kernel_version
 
 script_path=os.path.dirname(os.path.realpath(__file__))
 
+
+@pytest.mark.xfail(get_kernel_version() < 6.7, reason="TSM Changes introduced in kernel 6.7")
 def test_quote_check_configfs_tsm(qm):
     """
     Check that the configfs tsm for quote generation is available
@@ -37,6 +40,7 @@ def test_quote_check_configfs_tsm(qm):
 
     qm.stop()
 
+@pytest.mark.xfail(get_kernel_version() < 6.7, reason="TSM Changes introduced in kernel 6.7")
 def test_qgs_socket(qm):
     """
     Test QGS socket (No Intel Case ID)
