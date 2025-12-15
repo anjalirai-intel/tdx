@@ -15,7 +15,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranties
 # of MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
-
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 cleanup() {
     rm -f /tmp/tdx-guest-*.log &> /dev/null
@@ -41,6 +41,17 @@ LOGFILE='/tmp/tdx-guest-td.log'
 # approach 1 : userspace in the guest talks to QGS (on the host) directly
 QUOTE_VSOCK_ARGS="-device vhost-vsock-pci,guest-cid=3"
 # approach 2 : tdvmcall; see quote-generation-socket in qemu command line
+
+if [[ -z "${VM_KEY}" ]]; then
+    export VM_KEY="${SCRIPT_DIR}/vm_ssh_test_key"
+fi
+
+if ! virt-customize -a $TDXTEST_GUEST_IMG \
+    --root-password password:123456 --uninstall cloud-init \
+    --ssh-inject "root:file:${VM_KEY}.pub"; then
+    error "Failed to setup the VM image with 'virt-customize'."
+    exit 1
+fi
 
 /usr/libexec/qemu-kvm -D $LOGFILE \
            -accel kvm \
